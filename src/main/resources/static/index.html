@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetBee - Track Your Spending</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
+</head>
+<body>
+
+<div id="app">
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="bee-icon">🐝</span>
+                <span class="brand-text">BudgetBee</span>
+            </div>
+            <div class="nav-toggle" onclick="toggleNav()">☰</div>
+            <div class="nav-links" id="navLinks">
+                <a href="#" class="nav-link active" data-section="dashboard" onclick="showSection('dashboard')">Summary</a>
+                <a href="#" class="nav-link" data-section="expenses" onclick="showSection('expenses')">Expenses</a>
+                <a href="#" class="nav-link" data-section="analytics" onclick="showSection('analytics')">Analytics</a>
+                <a href="#" class="nav-link" data-section="reports" onclick="showSection('reports')">Reports</a>
+                <div class="nav-auth" id="navAuth">
+                    <button class="btn btn-sm btn-outline" onclick="openModal('loginModal')" id="loginBtn">Login</button>
+                    <button class="btn btn-sm btn-primary" onclick="openModal('registerModal')" id="registerBtn">Register</button>
+                    <div class="user-menu" id="userMenu" style="display:none">
+                        <span class="user-greeting" id="userGreeting"></span>
+                        <div class="user-dropdown">
+                            <a href="#" onclick="showSection('profile')">Profile</a>
+                            <a href="#" onclick="handleLogout()">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="heroSection" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Track your spending with warmth and clarity</h1>
+                <p>BudgetBee helps you manage your finances effortlessly. Set budgets, track expenses, and achieve your financial goals — all in one beautiful dashboard.</p>
+                <button class="btn btn-primary btn-lg" onclick="document.getElementById('dashboardSection').scrollIntoView({behavior:'smooth'})">Get Started</button>
+            </div>
+            <div class="hero-card">
+                <div class="hero-card-inner">
+                    <span class="hero-card-icon">🐝</span>
+                    <h3>Smart Budget Alerts</h3>
+                    <p>Get notified when you're approaching your monthly budget limit. Never overspend again!</p>
+                    <div class="hero-card-stats">
+                        <div><small>Alert at</small><strong>80%</strong></div>
+                        <div><small>Auto-track</small><strong>24/7</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboardSection" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>📊 Dashboard Overview</h2>
+                <div class="month-picker">
+                    <button onclick="changeMonth(-1)">◀</button>
+                    <span id="currentMonthDisplay"></span>
+                    <button onclick="changeMonth(1)">▶</button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards" id="summaryCards">
+                <div class="card summary-card">
+                    <div class="card-icon">💰</div>
+                    <div class="card-info">
+                        <span class="card-label">Total Spent</span>
+                        <span class="card-value" id="totalSpent">Rs.0</span>
+                    </div>
+                </div>
+                <div class="card summary-card">
+                    <div class="card-icon">📌</div>
+                    <div class="card-info">
+                        <span class="card-label">Last Expense</span>
+                        <span class="card-value" id="lastExpense">Rs.0</span>
+                    </div>
+                </div>
+                <div class="card summary-card">
+                    <div class="card-icon">📋</div>
+                    <div class="card-info">
+                        <span class="card-label">Expense Count</span>
+                        <span class="card-value" id="expenseCount">0</span>
+                    </div>
+                </div>
+                <div class="card summary-card">
+                    <div class="card-icon">💵</div>
+                    <div class="card-info">
+                        <span class="card-label">Remaining Budget</span>
+                        <span class="card-value" id="remainingBudget">Rs.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Card -->
+            <div class="card budget-card">
+                <div class="budget-header">
+                    <h3>🎯 Monthly Budget</h3>
+                </div>
+                <div class="budget-body">
+                    <div class="budget-input-group">
+                        <input type="number" id="budgetInput" placeholder="Enter budget amount" min="0" step="100">
+                        <button class="btn btn-primary" onclick="setMonthlyBudget()">Set Budget</button>
+                    </div>
+                    <div class="budget-progress" id="budgetProgress" style="display:none">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                        </div>
+                        <span id="progressText">0% used</span>
+                    </div>
+                    <div class="budget-alert" id="budgetAlert" style="display:none">
+                        ⚠️ Budget exceeded! You've crossed your monthly limit.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Form + List -->
+            <div class="split-layout">
+                <div class="card add-expense-card">
+                    <h3>✏️ Add Expense</h3>
+                    <form id="expenseForm" onsubmit="handleAddExpense(event)">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" id="expTitle" placeholder="e.g. Grocery shopping" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (Rs.)</label>
+                            <input type="number" id="expAmount" placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="expCategory" required>
+                                <option value="">Select category</option>
+                                <option value="Food">Food</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills & Utilities</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Health">Health</option>
+                                <option value="Education">Education</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="expDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description (optional)</label>
+                            <textarea id="expDescription" placeholder="Add notes..." rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="addExpBtn">Add Expense</button>
+                        <button type="button" class="btn btn-outline btn-block" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Cancel Edit</button>
+                    </form>
+                </div>
+
+                <div class="card expense-list-card">
+                    <div class="expense-list-header">
+                        <h3>📋 Recent Expenses</h3>
+                        <div class="expense-filters">
+                            <select id="filterCategory" onchange="loadExpenses()">
+                                <option value="">All Categories</option>
+                                <option value="Food">Food</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills & Utilities</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Health">Health</option>
+                                <option value="Education">Education</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="search-box">
+                                <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchExpenses(event)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expense-items" id="expenseItems">
+                        <div class="empty-state">No expenses yet. Add your first expense!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section id="analyticsSection" class="section" style="display:none">
+        <div class="container">
+            <div class="section-header">
+                <h2>📈 Analytics</h2>
+            </div>
+            <div class="analytics-grid">
+                <div class="card chart-card">
+                    <h3>Monthly Trend</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="card chart-card">
+                    <h3>Category Breakdown</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reports Section -->
+    <section id="reportsSection" class="section" style="display:none">
+        <div class="container">
+            <div class="section-header">
+                <h2>📄 Reports</h2>
+            </div>
+            <div class="card reports-card">
+                <h3>Download Monthly Report</h3>
+                <p>Get a detailed report of your expenses for any month.</p>
+                <div class="report-controls">
+                    <div class="form-group">
+                        <label>Select Month</label>
+                        <input type="month" id="reportMonth">
+                    </div>
+                    <div class="report-buttons">
+                        <button class="btn btn-primary" onclick="downloadReport('pdf')">📥 Download PDF</button>
+                        <button class="btn btn-outline" onclick="downloadReport('csv')">📥 Download CSV</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profileSection" class="section" style="display:none">
+        <div class="container">
+            <div class="section-header">
+                <h2>👤 Profile</h2>
+            </div>
+            <div class="card profile-card">
+                <div class="profile-avatar">🐝</div>
+                <form id="profileForm" onsubmit="handleUpdateProfile(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="profUsername" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profFullName" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profEmail" placeholder="your@email.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
+            <div class="modal-header">
+                <span class="bee-icon">🐝</span>
+                <h2>Welcome Back</h2>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="rememberMe"> Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <p class="form-footer">Don't have an account? <a href="#" onclick="switchModal('registerModal')">Register</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
+            <div class="modal-header">
+                <span class="bee-icon">🐝</span>
+                <h2>Create Account</h2>
+            </div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose a username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name (optional)</label>
+                    <input type="text" id="regFullName" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                <p class="form-footer">Already have an account? <a href="#" onclick="switchModal('loginModal')">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/expenses.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

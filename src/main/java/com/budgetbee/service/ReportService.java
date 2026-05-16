@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -45,13 +46,13 @@ public class ReportService {
             document.addPage(page);
 
             PDPageContentStream cs = new PDPageContentStream(document, page);
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 22);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 22);
             cs.beginText();
             cs.newLineAtOffset(50, 750);
             cs.showText("BudgetBee - Expense Report");
             cs.endText();
 
-            cs.setFont(PDType1Font.HELVETICA, 12);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
             addLine(cs, 50, 720, "User: " + user.getUsername());
 
             String monthName = java.time.YearMonth.of(year, month)
@@ -60,15 +61,15 @@ public class ReportService {
             addLine(cs, 50, 680, "Total Expense: Rs." + String.format("%.2f", totalExpense));
 
             int y = 650;
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 14);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
             addLine(cs, 50, y, "Expenses:");
             y -= 25;
 
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 10);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 10);
             addLine(cs, 50, y, String.format("%-4s %-25s %-12s %-15s %s", "#", "Title", "Amount", "Category", "Date"));
             y -= 18;
 
-            cs.setFont(PDType1Font.HELVETICA, 10);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
             int idx = 1;
             for (Expense e : expenses) {
                 if (y < 50) {
@@ -77,7 +78,7 @@ public class ReportService {
                     page = new PDPage(PDRectangle.A4);
                     document.addPage(page);
                     cs = new PDPageContentStream(document, page);
-                    cs.setFont(PDType1Font.HELVETICA, 10);
+                    cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
                     cs.beginText();
                     cs.newLineAtOffset(50, 750);
                     y = 750;
@@ -90,14 +91,14 @@ public class ReportService {
                 y -= 15;
             }
 
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 14);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
             cs.newLineAtOffset(0, -25);
             y -= 25;
             cs.showText("Category Summary:");
             cs.newLineAtOffset(0, -20);
             y -= 20;
 
-            cs.setFont(PDType1Font.HELVETICA, 10);
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
             for (Map<String, Object> entry : categorySummary) {
                 String cat = (String) entry.get("category");
                 Double t = (Double) entry.get("total");

@@ -1,17 +1,5 @@
 package com.budgetbee.service;
 
-import com.budgetbee.model.Expense;
-import com.budgetbee.model.User;
-import com.budgetbee.repository.ExpenseRepository;
-import com.opencsv.CSVWriter;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +8,19 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.springframework.stereotype.Service;
+
+import com.budgetbee.model.Expense;
+import com.budgetbee.model.User;
+import com.budgetbee.repository.ExpenseRepository;
+import com.opencsv.CSVWriter;
 
 @Service
 public class ReportService {
@@ -45,7 +46,8 @@ public class ReportService {
             PDPage page = new PDPage(PDRectangle.A4);
             document.addPage(page);
 
-            PDPageContentStream cs = new PDPageContentStream(document, page);
+            PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.OVERWRITE, false);
+
             cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 22);
             cs.beginText();
             cs.newLineAtOffset(50, 750);
@@ -57,6 +59,7 @@ public class ReportService {
 
             String monthName = java.time.YearMonth.of(year, month)
                     .getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+
             addLine(cs, 50, 700, "Month: " + monthName + " " + year);
             addLine(cs, 50, 680, "Total Expense: Rs." + String.format("%.2f", totalExpense));
 
@@ -70,33 +73,38 @@ public class ReportService {
             y -= 18;
 
             cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+            cs.beginText();
+            cs.newLineAtOffset(50, y);
+
             int idx = 1;
             for (Expense e : expenses) {
-                if (y < 50) {
+                if (y < 60) {
                     cs.endText();
                     cs.close();
+
                     page = new PDPage(PDRectangle.A4);
                     document.addPage(page);
-                    cs = new PDPageContentStream(document, page);
+
+                    cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.OVERWRITE, false);
                     cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
                     cs.beginText();
                     cs.newLineAtOffset(50, 750);
                     y = 750;
                 }
+
                 String title = e.getTitle().length() > 22 ? e.getTitle().substring(0, 22) + "..." : e.getTitle();
                 String line = String.format("%-4d %-25s Rs.%-8.2f %-15s %s",
                         idx++, title, e.getAmount(), e.getCategory(), e.getDate().toString());
+
                 cs.showText(line);
                 cs.newLineAtOffset(0, -15);
                 y -= 15;
             }
 
-            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
             cs.newLineAtOffset(0, -25);
-            y -= 25;
+            cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
             cs.showText("Category Summary:");
             cs.newLineAtOffset(0, -20);
-            y -= 20;
 
             cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
             for (Map<String, Object> entry : categorySummary) {
@@ -132,6 +140,7 @@ public class ReportService {
         List<Map<String, Object>> categorySummary = expenseRepository.getCategorySummary(user.getId(), start, end);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
         try (OutputStreamWriter osw = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
              CSVWriter writer = new CSVWriter(osw)) {
 
@@ -157,6 +166,7 @@ public class ReportService {
             writer.writeNext(new String[]{""});
             writer.writeNext(new String[]{"Category Summary"});
             writer.writeNext(new String[]{"Category", "Total"});
+
             for (Map<String, Object> entry : categorySummary) {
                 writer.writeNext(new String[]{
                         (String) entry.get("category"),

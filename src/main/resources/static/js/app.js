@@ -43,6 +43,11 @@ function showSection(section) {
 
     if (section === 'dashboard' || section === 'expenses') {
         loadDashboard();
+        if (section === 'expenses') {
+            setTimeout(() => {
+                document.querySelector('.add-expense-card')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
     }
     if (section === 'analytics') {
         loadDashboard();

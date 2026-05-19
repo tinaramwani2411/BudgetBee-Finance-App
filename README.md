@@ -5,7 +5,7 @@ BudgetBee is a full-stack web application that helps users manage their expenses
 ---
 
 ## 🚀 Live Demo
-👉 https://budgetbee-deploy-test.onrender.com
+👉 https://budgetbee-deploy-test.onrender.com/#
 
 ---
 

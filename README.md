@@ -1,184 +1,81 @@
-# 🐝 BudgetBee - Personal Expense Tracker
+# 💰 BudgetBee - Personal Finance Tracker
 
-BudgetBee is a full-stack web application for tracking personal expenses with a beautiful bee-themed design. Built with Spring Boot, MySQL, and vanilla JavaScript.
+BudgetBee is a full-stack web application that helps users manage their expenses and monthly budgets efficiently. It provides secure authentication and real-time financial tracking.
+
+---
+
+## 🚀 Live Demo
+👉 https://budgetbee-deploy-test.onrender.com
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend:
+- Java 17+
+- Spring Boot
+- Spring Data JPA (Hibernate)
+- Spring Security + JWT
+- REST APIs
+
+### Database:
+- MySQL (Aiven Cloud)
+
+### Deployment:
+- Render (Docker-based deployment)
+
+---
 
 ## ✨ Features
 
-- **Public Dashboard** - Anyone can view the homepage with demo analytics (no login required)
-- **User Authentication** - Register, Login, Logout with JWT + BCrypt
-- **Expense Management** - Add, Edit, Delete expenses with categories
-- **Dashboard** - Summary cards, monthly budget tracking, progress bar
-- **Analytics** - Monthly trend line chart & category doughnut chart (Chart.js)
-- **Reports** - Download PDF and CSV monthly reports
-- **Budget Alerts** - Visual warning when spending exceeds budget
-- **Dark Mode** - Toggle between light and dark themes
-- **Responsive** - Works on desktop, tablet, and mobile
+- 🔐 User Registration & Login (JWT Authentication)
+- 💸 Add / Update / Delete Expenses
+- 📊 Monthly Budget Management
+- 📈 Expense Tracking by Category
+- 🗄️ Cloud Database Integration
+- 🌐 Fully Deployed Backend API
 
-## 🛠 Tech Stack
+---
 
-| Layer    | Technology                     |
-|----------|--------------------------------|
-| Frontend | HTML5, CSS3, Vanilla JavaScript|
-| Backend  | Java 17, Spring Boot 3.2       |
-| Database | MySQL                          |
-| Auth     | JWT, BCrypt                    |
-| Charts   | Chart.js                       |
-| PDF      | Apache PDFBox                  |
-| CSV      | OpenCSV                        |
+## 🏗️ Project Structure
+src/main/java/com/budgetbee
+├── controller
+├── service
+├── repository
+├── model
+├── config
 
-## 📁 Project Structure
+## ⚙️ Environment Variables (Render)
 
-```
-BudgetBee-App/
-├── pom.xml
-├── src/
-│   ├── main/
-│   │   ├── java/com/budgetbee/
-│   │   │   ├── BudgetBeeApplication.java          # Entry point
-│   │   │   ├── config/
-│   │   │   │   ├── AppUserDetailsService.java      # Loads users for Spring Security
-│   │   │   │   ├── CorsConfig.java                 # CORS configuration
-│   │   │   │   ├── JwtAuthFilter.java              # JWT request filter
-│   │   │   │   ├── JwtUtil.java                    # JWT token utilities
-│   │   │   │   └── SecurityConfig.java             # Spring Security config
-│   │   │   ├── controller/
-│   │   │   │   ├── AuthController.java             # Login/Register endpoints
-│   │   │   │   ├── DashboardController.java        # Dashboard data + budget
-│   │   │   │   ├── ExpenseController.java          # CRUD expenses
-│   │   │   │   ├── ReportController.java           # PDF/CSV download
-│   │   │   │   └── UserController.java             # Profile update
-│   │   │   ├── dto/
-│   │   │   │   ├── AuthResponse.java
-│   │   │   │   ├── DashboardDTO.java
-│   │   │   │   ├── LoginRequest.java
-│   │   │   │   └── RegisterRequest.java
-│   │   │   ├── exception/
-│   │   │   │   ├── GlobalExceptionHandler.java     # Error handling
-│   │   │   │   └── ResourceNotFoundException.java
-│   │   │   ├── model/
-│   │   │   │   ├── Expense.java                    # Expense entity
-│   │   │   │   ├── MonthlyBudget.java              # Budget entity
-│   │   │   │   └── User.java                       # User entity
-│   │   │   ├── repository/
-│   │   │   │   ├── ExpenseRepository.java          # Expense queries
-│   │   │   │   ├── MonthlyBudgetRepository.java
-│   │   │   │   └── UserRepository.java
-│   │   │   └── service/
-│   │   │       ├── DashboardService.java           # Dashboard logic
-│   │   │       ├── ExpenseService.java             # Expense CRUD logic
-│   │   │       ├── ReportService.java              # PDF/CSV generation
-│   │   │       └── UserService.java                # Auth + profile logic
-│   │   └── resources/
-│   │       ├── application.properties              # Config
-│   │       ├── schema.sql                          # DB schema
-│   │       └── static/
-│   │           ├── index.html                      # Main frontend page
-│   │           ├── css/style.css                   # All styles
-│   │           └── js/
-│   │               ├── api.js                      # API helper
-│   │               ├── app.js                      # App init + navigation
-│   │               ├── auth.js                     # Auth UI logic
-│   │               ├── analytics.js                # Charts + reports
-│   │               ├── dashboard.js                # Dashboard data
-│   │               └── expenses.js                 # Expense CRUD UI
-│   └── test/java/com/budgetbee/
-└── README.md
-```
+Configure these in Render:
+SPRING_DATASOURCE_URL
+SPRING_DATASOURCE_USERNAME
+SPRING_DATASOURCE_PASSWORD
 
-## 🌐 API Reference
+## ▶️ How to Run Locally
 
-### Public Endpoints
-| Method | Endpoint                | Description          |
-|--------|-------------------------|----------------------|
-| GET    | /api/dashboard/public   | Get demo dashboard   |
-
-### Auth Endpoints (public)
-| Method | Endpoint             | Description      |
-|--------|----------------------|------------------|
-| POST   | /api/auth/register   | Register new user|
-| POST   | /api/auth/login      | Login user       |
-
-### Protected Endpoints (JWT required)
-| Method | Endpoint                    | Description            |
-|--------|-----------------------------|------------------------|
-| GET    | /api/auth/me                | Get current user       |
-| GET    | /api/dashboard              | Get user dashboard     |
-| GET    | /api/dashboard/budget       | Get monthly budget     |
-| POST   | /api/dashboard/budget       | Set monthly budget     |
-| GET    | /api/dashboard/budget-alert | Check budget exceeded  |
-| GET    | /api/expenses               | List expenses (filter) |
-| GET    | /api/expenses/search?q=     | Search expenses        |
-| POST   | /api/expenses               | Add expense            |
-| PUT    | /api/expenses/{id}          | Update expense         |
-| DELETE | /api/expenses/{id}          | Delete expense         |
-| GET    | /api/reports/pdf            | Download PDF report    |
-| GET    | /api/reports/csv            | Download CSV report    |
-| PUT    | /api/users/profile          | Update profile         |
-
-## 🚀 Step-by-Step Setup
-
-### Prerequisites
-- Java 17 or later
-- Maven 3.8+
-- MySQL 8.0+
-- Git (optional)
-
-### 1. Create Database
-Open MySQL and run:
-```sql
-CREATE DATABASE budgetbee_db;
-```
-
-### 2. Configure Database
-Edit `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/budgetbee_db
-spring.datasource.username=root       # Change to your MySQL username
-spring.datasource.password=root       # Change to your MySQL password
-```
-
-### 3. Build and Run
 ```bash
-cd BudgetBee-App
-mvn clean package
+git clone https://github.com/your-username/BudgetBee.git
+cd BudgetBee
+mvn clean install
 mvn spring-boot:run
-```
 
-The app starts at **http://localhost:8080**
+📌 API Endpoints (Example)
+POST   /api/auth/register
+POST   /api/auth/login
+GET    /api/expenses
+POST   /api/expenses
+DELETE /api/expenses/{id}
 
-### 4. Verify
-- Open browser at http://localhost:8080
-- The homepage loads instantly with demo data
-- Click Register to create an account
-- Login and start tracking expenses
+👩‍💻 Author
+Tina Ramwani
+GitHub: https://github.com/tinaramwani2411
+⭐ Future Improvements
+Frontend React integration
+Advanced analytics dashboard
+Notifications & reminders
+Mobile app version
 
-## 🐝 How It Works
+📄 License
 
-### Public Mode
-When you open the site, the dashboard shows sample data (demo analytics, sample expenses). The navbar shows Login and Register buttons. This allows anyone to immediately see what the app looks like.
-
-### After Login
-Once logged in, all demo data is replaced with your actual data from MySQL. You can:
-- Add, edit, delete expenses
-- Set a monthly budget and track spending
-- View charts (monthly trend + category breakdown)
-- Download PDF/CSV reports
-- Update your profile
-
-### Database Tables
-- **users** - Stores registered users
-- **expenses** - Stores expenses linked to users via `user_id`
-- **monthly_budgets** - Stores monthly budget per user
-
-## 👨‍💻 For Internship / Portfolio
-This project demonstrates:
-- Full-stack development (Java + Spring Boot + MySQL + JS)
-- REST API design and implementation
-- JWT authentication and security
-- PDF/CSV report generation
-- Chart.js data visualization
-- Responsive UI design
-- Clean architecture (Controller → Service → Repository)
-
-## 📝 License
-MIT
+This project is for educational/demo purposes.
